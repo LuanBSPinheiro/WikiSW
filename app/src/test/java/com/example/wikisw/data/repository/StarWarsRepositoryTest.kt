@@ -18,7 +18,6 @@ class StarWarsRepositoryTest {
 
     @Test
     fun getCharacters_should_return_mapped_characters_on_success() = runTest {
-        // GIVEN: Nova resposta da API simulando o swapi.info (sem barra no final do ID)
         val mockApiResponse = listOf(
             CharacterDto(
                 name = "Luke Skywalker",
@@ -33,6 +32,6 @@ class StarWarsRepositoryTest {
         // THEN
         assertEquals(1, result.size)
         assertEquals("Luke Skywalker", result[0].name)
-        assertEquals(1, result[0].id) // O ID '1' precisa ser extraído corretamente da nova URL
+        assertEquals(1, result[0].id)
     }
 }
