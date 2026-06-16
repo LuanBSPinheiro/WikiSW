@@ -11,7 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class) // Robolectric simula o ambiente do Android na JVM local
+@RunWith(RobolectricTestRunner::class)
 class CharacterDaoTest {
 
     private lateinit var database: CharacterDatabase
