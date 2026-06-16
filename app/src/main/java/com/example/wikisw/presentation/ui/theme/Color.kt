@@ -1,4 +1,4 @@
-package com.example.wikisw.ui.theme
+package com.example.wikisw.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
