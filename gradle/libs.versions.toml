@@ -14,6 +14,8 @@ room = "2.8.4"
 mockito = "5.23.0"
 mockitoKotlin = "6.3.0"
 coroutinesTest = "1.11.0"
+robolectric = "4.16.1"
+androidxTestCore = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +46,8 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 test-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 test-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 test-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+test-robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidxTestCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
