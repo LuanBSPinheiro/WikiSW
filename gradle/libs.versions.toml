@@ -16,6 +16,7 @@ mockitoKotlin = "6.3.0"
 coroutinesTest = "1.11.0"
 robolectric = "4.16.1"
 androidxTestCore = "1.7.0"
+koin = "4.2.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,11 @@ retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+# Injeção de Dependência (Koin)
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
 
 # Ferramentas de Teste Unitário (Local)
 test-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }

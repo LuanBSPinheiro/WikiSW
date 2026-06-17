@@ -60,6 +60,11 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    testImplementation(libs.koin.test)
+
     // TDD
     testImplementation(libs.test.mockito.core)
     testImplementation(libs.test.mockito.kotlin)
