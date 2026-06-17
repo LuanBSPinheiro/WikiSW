@@ -26,7 +26,12 @@ class StarWarsRepositoryTest {
     @Test
     fun getCharacters_should_fetch_from_api_and_save_to_cache_on_success() = runTest {
         // GIVEN
-        val mockApiResult = listOf(CharacterDto(name = "Luke Skywalker", url = "https://swapi.info/api/people/1"))
+        val mockApiResult = listOf(
+            CharacterDto(
+                name = "Luke Skywalker",
+                url = "https://swapi.info/api/people/1/"
+            )
+        )
         whenever(apiMock.fetchCharacters()).doReturn(mockApiResult)
         whenever(daoMock.getAllCharacters()).doReturn(emptyList())
 
@@ -44,7 +49,13 @@ class StarWarsRepositoryTest {
     fun getCharacters_should_return_cached_data_when_api_fails() = runTest {
         // GIVEN
         whenever(apiMock.fetchCharacters()).doThrow(IOException("No internet"))
-        val cachedEntities = listOf(CharacterEntity(id = 2, name = "C-3PO"))
+        val cachedEntities = listOf(
+            CharacterEntity(
+                id = 2, name = "C-3PO", height = "167", gender = "n/a", mass = "75",
+                hairColor = "n/a", skinColor = "gold", eyeColor = "yellow", birthYear = "112BBY",
+                homeworld = "Tatooine", species = "Droid"
+            )
+        )
         whenever(daoMock.getAllCharacters()).doReturn(cachedEntities)
 
         // WHEN

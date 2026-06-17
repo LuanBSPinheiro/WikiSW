@@ -12,4 +12,10 @@ interface CharacterDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCharacters(characters: List<CharacterEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlanet(planet: PlanetEntity)
+
+    @Query("SELECT * FROM planets WHERE id = :id")
+    suspend fun getPlanetById(id: String): PlanetEntity?
 }

@@ -33,8 +33,16 @@ class CharacterDaoTest {
     fun insertAndGetAllCharacters_should_persist_and_return_correct_data() = runTest {
         // GIVEN
         val localCharacters = listOf(
-            CharacterEntity(id = 1, name = "Luke Skywalker"),
-            CharacterEntity(id = 2, name = "C-3PO")
+            CharacterEntity(
+                id = 1, name = "Luke Skywalker", height = "172", gender = "male", mass = "77",
+                hairColor = "blond", skinColor = "fair", eyeColor = "blue", birthYear = "19BBY",
+                homeworld = "Tatooine", species = "Human"
+            ),
+            CharacterEntity(
+                id = 2, name = "C-3PO", height = "167", gender = "n/a", mass = "75",
+                hairColor = "n/a", skinColor = "gold", eyeColor = "yellow", birthYear = "112BBY",
+                homeworld = "Tatooine", species = "Droid"
+            )
         )
 
         // WHEN
