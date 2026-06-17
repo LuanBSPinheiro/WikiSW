@@ -15,5 +15,6 @@ data class CharacterEntity(
     val eyeColor: String,
     val birthYear: String,
     val homeworld: String,
-    val species: String
+    val species: String,
+    val isFavorite: Boolean = false
 )

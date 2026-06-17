@@ -1,23 +1,25 @@
 package com.example.wikisw.data.mapper
 
 import com.example.wikisw.data.api.CharacterDto
-import com.example.wikisw.domain.model.Character
+import com.example.wikisw.data.cache.CharacterEntity
 
-fun CharacterDto.toDomain(): Character {
-    val cleanedUrl = url.trimEnd('/')
-    val characterId = cleanedUrl.substringAfterLast("/").toIntOrNull() ?: 0
+fun CharacterDto.toEntity(): CharacterEntity {
+    val characterId = url.trimEnd('/').substringAfterLast("/").toIntOrNull() ?: 0
+    val planetId = homeworld.trimEnd('/').substringAfterLast("/")
+    val speciesId = species.firstOrNull()?.trimEnd('/')?.substringAfterLast("/") ?: "1" // Default para Humano caso venha vazio
 
-    return Character(
+    return CharacterEntity(
         id = characterId,
-        name = this.name,
-        height = this.height,
-        gender = this.gender,
-        mass = this.mass,
-        hairColor = this.hair_color,
-        skinColor = this.skin_color,
-        eyeColor = this.eye_color,
-        birthYear = this.birth_year,
-        homeworld = this.homeworld.trimEnd('/').substringAfterLast("/"),
-        species = this.species.firstOrNull()?.trimEnd('/')?.substringAfterLast("/") ?: "Human"
+        name = name,
+        height = height,
+        gender = gender,
+        mass = mass,
+        hairColor = hair_color,
+        skinColor = skin_color,
+        eyeColor = eye_color,
+        birthYear = birth_year,
+        homeworld = planetId,
+        species = speciesId,
+        isFavorite = false // Por padrão, dados novos da API começam desfavoritados
     )
 }

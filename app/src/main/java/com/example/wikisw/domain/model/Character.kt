@@ -6,10 +6,11 @@ data class Character(
     val height: String,
     val gender: String,
     val mass: String,
-    val hairColor: String = "N/A",
-    val skinColor: String = "N/A",
-    val eyeColor: String = "N/A",
-    val birthYear: String = "N/A",
-    val homeworld: String = "N/A",
-    val species: String = "N/A"
+    val hairColor: String,
+    val skinColor: String,
+    val eyeColor: String,
+    val birthYear: String,
+    val homeworld: String,
+    val species: String,
+    val isFavorite: Boolean
 )

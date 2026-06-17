@@ -1,8 +1,6 @@
 package com.example.wikisw.presentation.characters
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,16 +16,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +40,8 @@ fun CharactersScreen(
     viewModel: CharactersViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val onlyFavorites by viewModel.onlyFavorites.collectAsState()
 
     Scaffold { paddingValues ->
         Column(
@@ -61,49 +57,62 @@ fun CharactersScreen(
             ) {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = { viewModel.onSearchQueryChanged(it) },
                     placeholder = { Text("Buscar personagem...") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     modifier = Modifier.weight(1f)
                 )
 
-                Image(
-                    painter = painterResource(id = R.drawable.ic_sithjedi),
-                    contentDescription = "Filter Button",
-                    colorFilter = ColorFilter.tint(Color.Red),
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 16.dp)
-                        .size(50.dp)
-                        .clickable {  }
-                )
+                IconButton(
+                    onClick = { viewModel.onToggleFilterFavorites() },
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_sithjedi),
+                        contentDescription = "Filter Favorites",
+                        colorFilter = ColorFilter.tint(
+                            if (onlyFavorites) Color.Blue else Color.Red
+                        ),
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                Log.d("WikiSW", "Estado atual da UI: ${uiState::class.simpleName}")
                 when (val state = uiState) {
                     is CharactersUiState.Loading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
+
                     is CharactersUiState.Success -> {
-                        Log.d("WikiSW", "Sucesso! Quantidade de itens: ${state.characters.size}")
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(state.characters) { character ->
-                                CharacterItem(
-                                    character = character,
-                                    onItemClick = onCharacterClick
-                                )
+                        if (state.characters.isEmpty()) {
+                            Text("Nenhum personagem encontrado.", Modifier.align(Alignment.Center))
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(state.characters) { character ->
+                                    CharacterItem(
+                                        character = character,
+                                        onItemClick = onCharacterClick,
+                                        onToggleFavorite = {
+                                            viewModel.toggleFavorite(
+                                                it.id,
+                                                it.isFavorite
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
+
                     is CharactersUiState.Error -> {
-                        Log.e("WikiSW", "Erro no estado: ${state.message}")
                         Text(
-                            text = state.message,
-                            color = MaterialTheme.colorScheme.error,
+                            state.message,
+                            color = Color.Red,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }

@@ -1,56 +1,63 @@
 package com.example.wikisw.data.repository
 
-import android.util.Log
 import com.example.wikisw.data.api.StarWarsApi
 import com.example.wikisw.data.cache.CharacterDao
 import com.example.wikisw.data.cache.PlanetEntity
-import com.example.wikisw.data.mapper.toCache
+import com.example.wikisw.data.cache.SpeciesEntity
+import com.example.wikisw.data.mapper.toEntity
 import com.example.wikisw.data.mapper.toDomain
 import com.example.wikisw.domain.model.Character
 import com.example.wikisw.domain.repository.StarWarsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class StarWarsRepositoryImpl(
     private val api: StarWarsApi,
     private val dao: CharacterDao
 ) : StarWarsRepository {
 
-    override suspend fun getCharacters(): List<Character> {
+    override suspend fun refreshCharacters() {
         try {
-            val apiResult = api.fetchCharacters()
-            Log.d("WikiSW", "Repository: API retornou ${apiResult.size} itens brutos.")
-
-            if (apiResult.isNotEmpty()) {
-                val localEntities = apiResult.map { dto ->
-                    val domain = dto.toDomain()
-                    Log.d("WikiSW", "Repository: Mapeado - ID: ${domain.id}, Nome: ${domain.name}")
-                    domain.toCache()
-                }
-
-                dao.insertCharacters(localEntities)
-                Log.d("WikiSW", "Repository: Inserido no Room com sucesso.")
-            }
-        } catch (e: Exception) {
-            Log.e("WikiSW", "Repository: Falha ao buscar na API, tentando ler cache...", e)
+            val apiCharacters = api.fetchCharacters()
+            val entities = apiCharacters.map { it.toEntity() }
+            dao.insertCharacters(entities)
+        } catch (_: Exception) {
         }
+    }
 
-        val cachedEntities = dao.getAllCharacters()
-        Log.d("WikiSW", "Repository: Lidos do Room ${cachedEntities.size} itens para a UI.")
+    override fun getCharacters(searchQuery: String, onlyFavorites: Boolean): Flow<List<Character>> {
+        return dao.getCharactersFlow(searchQuery, onlyFavorites).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
 
-        return cachedEntities.map { it.toDomain() }
+    override suspend fun toggleFavorite(characterId: Int, isFavorite: Boolean) {
+        dao.updateFavoriteStatus(characterId, isFavorite)
     }
 
     override suspend fun getPlanetName(planetId: String): String {
-        val cachedPlanet = dao.getPlanetById(planetId)
-        if (cachedPlanet != null) return cachedPlanet.name
+        val cached = dao.getPlanetById(planetId)
+        if (cached != null) return cached.name
 
         return try {
-            val apiPlanet = api.fetchPlanet(planetId)
-            val entity = PlanetEntity(id = planetId, name = apiPlanet.name)
-
-            dao.insertPlanet(entity)
-            apiPlanet.name
-        } catch (e: Exception) {
+            val res = api.fetchPlanet(planetId)
+            dao.insertPlanet(PlanetEntity(planetId, res.name))
+            res.name
+        } catch (_: Exception) {
             "Desconhecido ($planetId)"
+        }
+    }
+
+    override suspend fun getSpeciesName(speciesId: String): String {
+        val cached = dao.getSpeciesById(speciesId)
+        if (cached != null) return cached.name
+
+        return try {
+            val res = api.fetchSpecies(speciesId)
+            dao.insertSpecies(SpeciesEntity(speciesId, res.name))
+            res.name
+        } catch (_: Exception) {
+            "Desconhecido ($speciesId)"
         }
     }
 }

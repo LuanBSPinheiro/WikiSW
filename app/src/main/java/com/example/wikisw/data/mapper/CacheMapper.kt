@@ -15,7 +15,8 @@ fun CharacterEntity.toDomain(): Character {
         eyeColor = this.eyeColor,
         birthYear = this.birthYear,
         homeworld = this.homeworld,
-        species = this.species
+        species = this.species,
+        isFavorite = this.isFavorite
     )
 }
 
@@ -31,6 +32,7 @@ fun Character.toCache(): CharacterEntity {
         eyeColor = this.eyeColor,
         birthYear = this.birthYear,
         homeworld = this.homeworld,
-        species = this.species
+        species = this.species,
+        isFavorite = this.isFavorite
     )
 }

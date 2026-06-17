@@ -4,50 +4,97 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wikisw.domain.usecase.GetCharactersUseCase
 import com.example.wikisw.domain.usecase.GetPlanetNameUseCase
+import com.example.wikisw.domain.usecase.GetSpeciesNameUseCase
+import com.example.wikisw.domain.usecase.ToggleFavoriteUseCase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CharactersViewModel(
-    private val getCharactersUseCase: GetCharactersUseCase,
-    private val getPlanetNameUseCase: GetPlanetNameUseCase
+    private val getCharactersUseCase: GetCharactersUseCase, // UseCase que agora escuta os Filtros do Flow
+    private val getPlanetNameUseCase: GetPlanetNameUseCase,
+    private val getSpeciesNameUseCase: GetSpeciesNameUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ViewModel() {
 
+    // Estados dos Filtros da Lista
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    private val _onlyFavorites = MutableStateFlow(false)
+    val onlyFavorites = _onlyFavorites.asStateFlow()
+
     private val _uiState = MutableStateFlow<CharactersUiState>(CharactersUiState.Loading)
-    private val _planetName = MutableStateFlow("Carregando...")
     val uiState: StateFlow<CharactersUiState> = _uiState.asStateFlow()
-    val planetName: StateFlow<String> = _planetName.asStateFlow()
+
+    private val _detailsState = MutableStateFlow<Pair<String, String>>(Pair("Carregando...", "Carregando..."))
+    val detailsState = _detailsState.asStateFlow()
 
     init {
-        loadCharacters()
+        viewModelScope.launch {
+            getCharactersUseCase.refresh()
+        }
+
+        observeCharactersFlow()
     }
 
-    fun loadCharacters() {
-        viewModelScope.launch {
-            _uiState.value = CharactersUiState.Loading
-
-            try {
-                val characters = getCharactersUseCase()
-                _uiState.value = CharactersUiState.Success(characters)
-            } catch (e: Exception) {
-                _uiState.value = CharactersUiState.Error(
-                    message = e.localizedMessage ?: "Ocorreu um erro inesperado."
-                )
+    private fun observeCharactersFlow() {
+        _searchQuery
+            .debounce(300.milliseconds)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                getCharactersUseCase.executeFlow(query, _onlyFavorites.value)
             }
+            .onEach { characters ->
+                _uiState.value = CharactersUiState.Success(characters)
+            }
+            .catch { e ->
+                _uiState.value = CharactersUiState.Error(e.localizedMessage ?: "Erro local")
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun onSearchQueryChanged(newQuery: String) {
+        _searchQuery.value = newQuery
+    }
+
+    fun onToggleFilterFavorites() {
+        _onlyFavorites.value = !_onlyFavorites.value
+        viewModelScope.launch {
+            getCharactersUseCase.executeFlow(_searchQuery.value, _onlyFavorites.value)
+                .collect { characters -> _uiState.value = CharactersUiState.Success(characters) }
         }
     }
 
-    fun loadPlanetName(planetId: String) {
-        _planetName.value = "Carregando..."
+    fun toggleFavorite(characterId: Int, isCurrentlyFavorite: Boolean) {
+        viewModelScope.launch {
+            toggleFavoriteUseCase(characterId, !isCurrentlyFavorite)
+        }
+    }
+
+    fun loadDetailsInParallel(planetId: String, speciesId: String) {
+        _detailsState.value = Pair("Carregando...", "Carregando...")
 
         viewModelScope.launch {
-            try {
-                val name = getPlanetNameUseCase(planetId)
-                _planetName.value = name
-            } catch (e: Exception) {
-                _planetName.value = "Desconhecido"
-            }
+            val planetDeferred = async { getPlanetNameUseCase(planetId) }
+            val speciesDeferred = async { getSpeciesNameUseCase(speciesId) }
+
+            val planetName = planetDeferred.await()
+            val speciesName = speciesDeferred.await()
+
+            _detailsState.value = Pair(planetName, speciesName)
         }
     }
 }

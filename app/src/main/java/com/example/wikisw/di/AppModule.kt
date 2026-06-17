@@ -7,6 +7,8 @@ import com.example.wikisw.data.repository.StarWarsRepositoryImpl
 import com.example.wikisw.domain.repository.StarWarsRepository
 import com.example.wikisw.domain.usecase.GetCharactersUseCase
 import com.example.wikisw.domain.usecase.GetPlanetNameUseCase
+import com.example.wikisw.domain.usecase.GetSpeciesNameUseCase
+import com.example.wikisw.domain.usecase.ToggleFavoriteUseCase
 import com.example.wikisw.presentation.characters.CharactersViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -48,13 +50,17 @@ val repositoryModule = module {
 val useCaseModule = module {
     factory { GetCharactersUseCase(repository = get()) }
     factory { GetPlanetNameUseCase(repository = get()) }
+    factory { GetSpeciesNameUseCase(repository = get()) }
+    factory { ToggleFavoriteUseCase(repository = get()) }
 }
 
 val viewModelModule = module {
     viewModel {
         CharactersViewModel(
             getCharactersUseCase = get(),
-            getPlanetNameUseCase = get()
+            getPlanetNameUseCase = get(),
+            getSpeciesNameUseCase = get(),
+            toggleFavoriteUseCase = get()
         )
     }
 }

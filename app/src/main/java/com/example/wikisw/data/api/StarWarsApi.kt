@@ -17,9 +17,8 @@ data class CharacterDto(
     val species: List<String> = emptyList()
 )
 
-data class PlanetDto(
-    val name: String,
-)
+data class PlanetDto(val name: String)
+data class SpeciesDto(val name: String)
 
 interface StarWarsApi {
     @GET("api/people")
@@ -27,4 +26,7 @@ interface StarWarsApi {
 
     @GET("api/planets/{id}")
     suspend fun fetchPlanet(@Path("id") id: String): PlanetDto
+
+    @GET("api/species/{id}")
+    suspend fun fetchSpecies(@Path("id") id: String): SpeciesDto
 }

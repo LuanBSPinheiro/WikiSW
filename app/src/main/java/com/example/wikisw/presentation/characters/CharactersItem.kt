@@ -26,6 +26,7 @@ import com.example.wikisw.domain.model.Character
 fun CharacterItem(
     character: Character,
     onItemClick: (Character) -> Unit,
+    onToggleFavorite: (Character) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -50,7 +51,7 @@ fun CharacterItem(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, top = 4.dp)
+                    .padding(start = 16.dp, top = 4.dp, end = 60.dp)
             ) {
                 Text(text = "Altura: ${character.height}", fontSize = 14.sp, color = Color.Gray)
                 Text(text = "Gênero: ${character.gender}", fontSize = 14.sp, color = Color.Gray)
@@ -58,11 +59,7 @@ fun CharacterItem(
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 8.dp
-                ),
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
                 thickness = 0.5.dp,
                 color = Color.Black
             )
@@ -70,12 +67,15 @@ fun CharacterItem(
 
         Image(
             painter = painterResource(id = R.drawable.ic_sithjedi),
-            contentDescription = "Faction Icon",
-            colorFilter = ColorFilter.tint(Color(0xFF616161)),
+            contentDescription = "Favorite Icon",
+            colorFilter = ColorFilter.tint(
+                if (character.isFavorite) Color.Blue else Color(0xFF616161)
+            ),
             modifier = Modifier
-                .size(50.dp)
+                .size(45.dp)
                 .align(Alignment.CenterEnd)
                 .padding(end = 16.dp)
+                .clickable { onToggleFavorite(character) }
         )
     }
 }
