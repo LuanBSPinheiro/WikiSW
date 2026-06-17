@@ -6,7 +6,9 @@ import com.example.wikisw.data.cache.CharacterDatabase
 import com.example.wikisw.data.repository.StarWarsRepositoryImpl
 import com.example.wikisw.domain.repository.StarWarsRepository
 import com.example.wikisw.domain.usecase.GetCharactersUseCase
+import com.example.wikisw.presentation.characters.CharactersViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -44,4 +46,8 @@ val useCaseModule = module {
     factory { GetCharactersUseCase(repository = get()) }
 }
 
-val appModules = listOf(networkModule, databaseModule, repositoryModule, useCaseModule)
+val viewModelModule = module {
+    viewModel { CharactersViewModel(getCharactersUseCase = get()) }
+}
+
+val appModules = listOf(networkModule, databaseModule, repositoryModule, useCaseModule, viewModelModule)
