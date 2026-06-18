@@ -84,21 +84,21 @@ fun CharacterItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Altura: ${character.height}",
+                    text = "Altura: ${character.height.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}",
                     fontSize = 12.sp,
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(vertical = 0.5.dp)
                 )
                 Text(
-                    text = "Gênero: ${character.gender}",
+                    text = "Gênero: ${character.gender.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}",
                     fontSize = 12.sp,
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(vertical = 0.5.dp)
                 )
                 Text(
-                    text = "Peso: ${character.mass}",
+                    text = "Peso: ${character.mass.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}",
                     fontSize = 12.sp,
                     color = TextSecondary,
                     textAlign = TextAlign.Center,

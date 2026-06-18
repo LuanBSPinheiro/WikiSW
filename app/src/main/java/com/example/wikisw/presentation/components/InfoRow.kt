@@ -35,7 +35,7 @@ fun InfoRow(label: String, value: String) {
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = value,
+            text = value.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium
