@@ -60,4 +60,10 @@ class StarWarsRepositoryImpl(
             "Desconhecido ($speciesId)"
         }
     }
+
+    override fun getCharacterById(characterId: Int): Flow<Character?> {
+        return dao.getCharacterByIdFlow(characterId).map { entity ->
+            entity?.toDomain()
+        }
+    }
 }

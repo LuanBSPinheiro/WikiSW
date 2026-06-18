@@ -32,4 +32,7 @@ interface CharacterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insertSpecies(species: SpeciesEntity)
     @Query("SELECT * FROM species WHERE id = :id")
     suspend fun getSpeciesById(id: String): SpeciesEntity?
+
+    @Query("SELECT * FROM characters WHERE id = :characterId")
+    fun getCharacterByIdFlow(characterId: Int): Flow<CharacterEntity?>
 }

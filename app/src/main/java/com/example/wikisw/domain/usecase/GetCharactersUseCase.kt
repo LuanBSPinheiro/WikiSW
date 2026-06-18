@@ -14,4 +14,8 @@ class GetCharactersUseCase(
     fun executeFlow(searchQuery: String, onlyFavorites: Boolean): Flow<List<Character>> {
         return repository.getCharacters(searchQuery, onlyFavorites)
     }
+
+    fun executeSingle(characterId: Int): Flow<Character?> {
+        return repository.getCharacterById(characterId)
+    }
 }

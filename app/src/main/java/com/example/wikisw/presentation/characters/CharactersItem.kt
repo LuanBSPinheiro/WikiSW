@@ -4,10 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,53 +34,63 @@ fun CharacterItem(
     onToggleFavorite: (Character) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onItemClick(character) }
-            .padding(top = 8.dp)
+            .padding(4.dp)
+            .height(145.dp)
+            .clickable { onItemClick(character) },
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF1E1E24)
+        ),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2C2C35)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
+                .fillMaxSize()
+                .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = character.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
+            Box(
                 modifier = Modifier.fillMaxWidth()
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, top = 4.dp, end = 60.dp)
             ) {
-                Text(text = "Altura: ${character.height}", fontSize = 14.sp, color = Color.Gray)
-                Text(text = "Gênero: ${character.gender}", fontSize = 14.sp, color = Color.Gray)
-                Text(text = "Peso: ${character.mass}", fontSize = 14.sp, color = Color.Gray)
+                Text(
+                    text = character.name,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 22.dp)
+                        .align(Alignment.Center)
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_sithjedi),
+                    contentDescription = "Toggle Favorite",
+                    colorFilter = ColorFilter.tint(
+                        if (character.isFavorite) Color(0xFF0066FF) else Color(0xFF52525B)
+                    ),
+                    modifier = Modifier
+                        .size(28.dp)
+                        .align(Alignment.TopEnd)
+                        .clickable { onToggleFavorite(character) }
+                )
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                thickness = 0.5.dp,
-                color = Color.Black
-            )
-        }
+            Spacer(modifier = Modifier.height(2.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.ic_sithjedi),
-            contentDescription = "Favorite Icon",
-            colorFilter = ColorFilter.tint(
-                if (character.isFavorite) Color.Blue else Color(0xFF616161)
-            ),
-            modifier = Modifier
-                .size(45.dp)
-                .align(Alignment.CenterEnd)
-                .padding(end = 16.dp)
-                .clickable { onToggleFavorite(character) }
-        )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Altura: ${character.height}", fontSize = 12.sp, color = Color(0xFFA0A0AB), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 0.5.dp))
+                Text(text = "Gênero: ${character.gender}", fontSize = 12.sp, color = Color(0xFFA0A0AB), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 0.5.dp))
+                Text(text = "Peso: ${character.mass}", fontSize = 12.sp, color = Color(0xFFA0A0AB), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 0.5.dp))
+            }
+        }
     }
 }

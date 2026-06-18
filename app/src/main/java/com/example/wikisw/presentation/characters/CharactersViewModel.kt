@@ -2,6 +2,7 @@ package com.example.wikisw.presentation.characters
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wikisw.domain.model.Character
 import com.example.wikisw.domain.usecase.GetCharactersUseCase
 import com.example.wikisw.domain.usecase.GetPlanetNameUseCase
 import com.example.wikisw.domain.usecase.GetSpeciesNameUseCase
@@ -23,23 +24,25 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CharactersViewModel(
-    private val getCharactersUseCase: GetCharactersUseCase, // UseCase que agora escuta os Filtros do Flow
-    private val getPlanetNameUseCase: GetPlanetNameUseCase,
+    private val getCharactersUseCase: GetCharactersUseCase,
     private val getSpeciesNameUseCase: GetSpeciesNameUseCase,
-    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    val getPlanetNameUseCase: GetPlanetNameUseCase
 ) : ViewModel() {
 
-    // Estados dos Filtros da Lista
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
     private val _onlyFavorites = MutableStateFlow(false)
+    private val _currentCharacter = MutableStateFlow<Character?>(null)
+
+    val searchQuery = _searchQuery.asStateFlow()
+    val currentCharacter = _currentCharacter.asStateFlow()
     val onlyFavorites = _onlyFavorites.asStateFlow()
 
     private val _uiState = MutableStateFlow<CharactersUiState>(CharactersUiState.Loading)
     val uiState: StateFlow<CharactersUiState> = _uiState.asStateFlow()
 
-    private val _detailsState = MutableStateFlow<Pair<String, String>>(Pair("Carregando...", "Carregando..."))
+    private val _detailsState =
+        MutableStateFlow<Pair<String, String>>(Pair("Carregando...", "Carregando..."))
     val detailsState = _detailsState.asStateFlow()
 
     init {
@@ -68,6 +71,12 @@ class CharactersViewModel(
 
     fun onSearchQueryChanged(newQuery: String) {
         _searchQuery.value = newQuery
+    }
+
+    fun observeCharacter(id: Int) {
+        getCharactersUseCase.executeSingle(id)
+            .onEach { _currentCharacter.value = it }
+            .launchIn(viewModelScope)
     }
 
     fun onToggleFilterFavorites() {

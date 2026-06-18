@@ -12,4 +12,5 @@ interface StarWarsRepository {
 
     suspend fun getPlanetName(planetId: String): String
     suspend fun getSpeciesName(speciesId: String): String
+    fun getCharacterById(characterId: Int): Flow<Character?>
 }

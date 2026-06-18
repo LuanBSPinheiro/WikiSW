@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +21,10 @@ import com.example.wikisw.presentation.ui.theme.WikiSWTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge(
+            statusBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        )
         setContent {
             WikiSWTheme {
                 Surface(
@@ -29,14 +34,13 @@ class MainActivity : ComponentActivity() {
                     var selectedCharacter by remember { mutableStateOf<Character?>(null) }
 
                     if (selectedCharacter == null) {
-                        CharactersScreen(
-                            onCharacterClick = { character ->
-                                selectedCharacter = character
-                            }
-                        )
+                        CharactersScreen(onCharacterClick = { selectedCharacter = it })
                     } else {
                         BackHandler { selectedCharacter = null }
-                        CharacterInfoScreen(character = selectedCharacter!!)
+                        CharacterInfoScreen(
+                            characterId = selectedCharacter!!.id,
+                            onBackClick = { selectedCharacter = null }
+                        )
                     }
                 }
             }
