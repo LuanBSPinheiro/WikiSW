@@ -32,10 +32,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.wikisw.R
 import com.example.wikisw.domain.model.Character
 import com.example.wikisw.presentation.components.ImperialTopBar
+import com.example.wikisw.presentation.ui.theme.DarkBackground
+import com.example.wikisw.presentation.ui.theme.EmpireRed
+import com.example.wikisw.presentation.ui.theme.RebelBlue
+import com.example.wikisw.presentation.ui.theme.SurfaceDark
+import com.example.wikisw.presentation.ui.theme.TextSecondary
+import com.example.wikisw.presentation.ui.theme.BorderGray
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -48,130 +56,190 @@ fun CharactersScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val onlyFavorites by viewModel.onlyFavorites.collectAsState()
 
+    CharactersScreenContent(
+        uiState = uiState,
+        searchQuery = searchQuery,
+        onlyFavorites = onlyFavorites,
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onToggleFilterFavorites = viewModel::onToggleFilterFavorites,
+        onCharacterClick = onCharacterClick,
+        onToggleFavorite = { viewModel.toggleFavorite(it.id, it.isFavorite) },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun CharactersScreenContent(
+    uiState: CharactersUiState,
+    searchQuery: String,
+    onlyFavorites: Boolean,
+    onSearchQueryChanged: (String) -> Unit,
+    onToggleFilterFavorites: () -> Unit,
+    onCharacterClick: (Character) -> Unit,
+    onToggleFavorite: (Character) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
-        containerColor = Color(0xFF0F0F11)
+        containerColor = DarkBackground,
+        modifier = modifier
     ) { paddingValues ->
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
 
             ImperialTopBar(
-                subtitle = "Galactic Records"
+                subtitle = stringResource(R.string.galactic_records)
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { viewModel.onSearchQueryChanged(it) },
-                    placeholder = { Text("Filtrar registros...", color = Color(0xFF71717A)) },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = null,
-                            tint = Color(0xFF71717A)
-                        )
-                    },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    shape = RoundedCornerShape(6.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF16161A),
-                        unfocusedContainerColor = Color(0xFF16161A),
-                        focusedBorderColor = Color(0xFFE53935),
-                        unfocusedBorderColor = Color(0xFF27272A),
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White
-                    )
-                )
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChanged,
+                onlyFavorites = onlyFavorites,
+                onToggleFavorites = onToggleFilterFavorites
+            )
 
-                Box(
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(54.dp)
-                        .background(
-                            color = if (onlyFavorites) Color(0xFF0066FF).copy(alpha = 0.15f) else Color(
-                                0xFF16161A
-                            ),
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                        .clickable { viewModel.onToggleFilterFavorites() }
-                        .background(
-                            color = Color.Transparent,
-                            shape = RoundedCornerShape(6.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_sithjedi),
-                        contentDescription = "Filter Favorites",
-                        colorFilter = ColorFilter.tint(
-                            if (onlyFavorites) Color(0xFF0066FF) else Color(0xFF71717A)
-                        ),
-                        modifier = Modifier.size(34.dp)
+            CharactersContent(
+                uiState = uiState,
+                onCharacterClick = onCharacterClick,
+                onToggleFavorite = onToggleFavorite
+            )
+        }
+    }
+}
+
+@Composable
+fun SearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onlyFavorites: Boolean,
+    onToggleFavorites: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            placeholder = { Text(stringResource(R.string.filter_records), color = TextSecondary) },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = null,
+                    tint = TextSecondary
+                )
+            },
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            shape = RoundedCornerShape(6.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = SurfaceDark,
+                unfocusedContainerColor = SurfaceDark,
+                focusedBorderColor = EmpireRed,
+                unfocusedBorderColor = BorderGray,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            )
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .size(54.dp)
+                .background(
+                    color = if (onlyFavorites) RebelBlue.copy(alpha = 0.15f) else SurfaceDark,
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .clickable { onToggleFavorites() },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_sithjedi),
+                contentDescription = stringResource(R.string.filter_favorites),
+                colorFilter = ColorFilter.tint(
+                    if (onlyFavorites) RebelBlue else TextSecondary
+                ),
+                modifier = Modifier.size(34.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun CharactersContent(
+    uiState: CharactersUiState,
+    onCharacterClick: (Character) -> Unit,
+    onToggleFavorite: (Character) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 6.dp)
+    ) {
+        when (uiState) {
+            is CharactersUiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = EmpireRed
+                )
+            }
+
+            is CharactersUiState.Success -> {
+                if (uiState.characters.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.no_records_found),
+                        color = TextSecondary,
+                        modifier = Modifier.align(Alignment.Center)
                     )
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(uiState.characters) { character ->
+                            CharacterItem(
+                                character = character,
+                                onItemClick = onCharacterClick,
+                                onToggleFavorite = { onToggleFavorite(character) }
+                            )
+                        }
+                    }
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 6.dp)
-            ) {
-                when (val state = uiState) {
-                    is CharactersUiState.Loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = Color(0xFFE53935)
-                        )
-                    }
-
-                    is CharactersUiState.Success -> {
-                        if (state.characters.isEmpty()) {
-                            Text(
-                                text = "Nenhum registro imperial correspondente.",
-                                color = Color(0xFF71717A),
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        } else {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(2),
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(bottom = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                items(state.characters) { character ->
-                                    CharacterItem(
-                                        character = character,
-                                        onItemClick = onCharacterClick,
-                                        onToggleFavorite = {
-                                            viewModel.toggleFavorite(
-                                                it.id,
-                                                it.isFavorite
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    is CharactersUiState.Error -> {
-                        Text(
-                            text = state.message,
-                            color = Color(0xFFE53935),
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+            is CharactersUiState.Error -> {
+                Text(
+                    text = uiState.message,
+                    color = EmpireRed,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun CharactersScreenPreview() {
+    CharactersScreenContent(
+        uiState = CharactersUiState.Success(
+            listOf(
+                Character(1, "Luke Skywalker", "172", "male", "77", "blond", "fair", "blue", "19BBY", "", "", false),
+                Character(2, "C-3PO", "167", "n/a", "75", "n/a", "gold", "yellow", "112BBY", "", "", true)
+            )
+        ),
+        searchQuery = "",
+        onlyFavorites = false,
+        onSearchQueryChanged = {},
+        onToggleFilterFavorites = {},
+        onCharacterClick = {},
+        onToggleFavorite = {}
+    )
 }

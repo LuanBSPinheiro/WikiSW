@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">WikiSW</string>
+    <string name="galactic_records">Galactic Records</string>
+    <string name="filter_records">Filtrar registros…</string>
+    <string name="no_records_found">Nenhum registro imperial correspondente.</string>
+    <string name="filter_favorites">Filter Favorites</string>
+    <string name="label_height">ALTURA</string>
+    <string name="label_gender">GÊNERO</string>
+    <string name="label_mass">PESO</string>
+    <string name="label_hair">CABELO</string>
+    <string name="label_skin">PELE</string>
+    <string name="label_eyes">OLHOS</string>
+    <string name="label_birth">NASCIMENTO</string>
+    <string name="label_planet">PLANETA</string>
+    <string name="label_species">ESPÉCIE</string>
+    <string name="favorite_record">FAVORITAR REGISTRO</string>
+    <string name="record_favorited">REGISTRO FAVORITADO</string>
+    <string name="loading">Carregando…</string>
+    <string name="unknown">Desconhecido (%1$s)</string>
 </resources>

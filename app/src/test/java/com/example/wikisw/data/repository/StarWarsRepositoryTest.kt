@@ -5,16 +5,16 @@ import com.example.wikisw.data.api.StarWarsApi
 import com.example.wikisw.data.cache.CharacterDao
 import com.example.wikisw.data.cache.CharacterEntity
 import com.example.wikisw.domain.repository.StarWarsRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.IOException
 
 class StarWarsRepositoryTest {
 
@@ -24,7 +24,7 @@ class StarWarsRepositoryTest {
     private val repository: StarWarsRepository = StarWarsRepositoryImpl(apiMock, daoMock)
 
     @Test
-    fun getCharacters_should_fetch_from_api_and_save_to_cache_on_success() = runTest {
+    fun `refreshCharacters should fetch from api and save to cache`() = runTest {
         // GIVEN
         val mockApiResult = listOf(
             CharacterDto(
@@ -33,22 +33,18 @@ class StarWarsRepositoryTest {
             )
         )
         whenever(apiMock.fetchCharacters()).doReturn(mockApiResult)
-        whenever(daoMock.getAllCharacters()).doReturn(emptyList())
 
         // WHEN
-        val result = repository.getCharacters()
+        repository.refreshCharacters()
 
         // THEN
-        assertEquals(1, result.size)
-        assertEquals("Luke Skywalker", result[0].name)
-
+        verify(apiMock).fetchCharacters()
         verify(daoMock).insertCharacters(any())
     }
 
     @Test
-    fun getCharacters_should_return_cached_data_when_api_fails() = runTest {
+    fun `getCharacters should return characters from dao flow`() = runTest {
         // GIVEN
-        whenever(apiMock.fetchCharacters()).doThrow(IOException("No internet"))
         val cachedEntities = listOf(
             CharacterEntity(
                 id = 2, name = "C-3PO", height = "167", gender = "n/a", mass = "75",
@@ -56,14 +52,13 @@ class StarWarsRepositoryTest {
                 homeworld = "Tatooine", species = "Droid"
             )
         )
-        whenever(daoMock.getAllCharacters()).doReturn(cachedEntities)
+        whenever(daoMock.getCharactersFlow("", false)).thenReturn(flowOf(cachedEntities))
 
         // WHEN
-        val result = repository.getCharacters()
+        val result = repository.getCharacters("", false).first()
 
         // THEN
         assertEquals(1, result.size)
         assertEquals("C-3PO", result[0].name)
-        assertEquals(2, result[0].id)
     }
 }

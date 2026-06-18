@@ -1,6 +1,5 @@
 package com.example.wikisw.presentation.characters
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.wikisw.R
 import com.example.wikisw.domain.model.Character
+import com.example.wikisw.presentation.components.FavoriteIcon
+import com.example.wikisw.presentation.ui.theme.SurfaceDark
+import com.example.wikisw.presentation.ui.theme.BorderGray
+import com.example.wikisw.presentation.ui.theme.TextSecondary
 
 @Composable
 fun CharacterItem(
@@ -42,9 +42,9 @@ fun CharacterItem(
             .clickable { onItemClick(character) },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1E1E24)
+            containerColor = SurfaceDark
         ),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2C2C35)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, BorderGray),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -68,16 +68,12 @@ fun CharacterItem(
                         .align(Alignment.Center)
                 )
 
-                Image(
-                    painter = painterResource(id = R.drawable.ic_sithjedi),
-                    contentDescription = "Toggle Favorite",
-                    colorFilter = ColorFilter.tint(
-                        if (character.isFavorite) Color(0xFF0066FF) else Color(0xFF52525B)
-                    ),
+                FavoriteIcon(
+                    isFavorite = character.isFavorite,
+                    onClick = { onToggleFavorite(character) },
                     modifier = Modifier
                         .size(28.dp)
                         .align(Alignment.TopEnd)
-                        .clickable { onToggleFavorite(character) }
                 )
             }
 
@@ -87,9 +83,27 @@ fun CharacterItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Altura: ${character.height}", fontSize = 12.sp, color = Color(0xFFA0A0AB), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 0.5.dp))
-                Text(text = "Gênero: ${character.gender}", fontSize = 12.sp, color = Color(0xFFA0A0AB), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 0.5.dp))
-                Text(text = "Peso: ${character.mass}", fontSize = 12.sp, color = Color(0xFFA0A0AB), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 0.5.dp))
+                Text(
+                    text = "Altura: ${character.height}",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 0.5.dp)
+                )
+                Text(
+                    text = "Gênero: ${character.gender}",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 0.5.dp)
+                )
+                Text(
+                    text = "Peso: ${character.mass}",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 0.5.dp)
+                )
             }
         }
     }

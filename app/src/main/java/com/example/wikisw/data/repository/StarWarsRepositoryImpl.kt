@@ -1,5 +1,6 @@
 package com.example.wikisw.data.repository
 
+import android.util.Log
 import com.example.wikisw.data.api.StarWarsApi
 import com.example.wikisw.data.cache.CharacterDao
 import com.example.wikisw.data.cache.PlanetEntity
@@ -11,6 +12,9 @@ import com.example.wikisw.domain.repository.StarWarsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Implementation of [StarWarsRepository] that coordinates data between the network and local cache.
+ */
 class StarWarsRepositoryImpl(
     private val api: StarWarsApi,
     private val dao: CharacterDao
@@ -21,7 +25,9 @@ class StarWarsRepositoryImpl(
             val apiCharacters = api.fetchCharacters()
             val entities = apiCharacters.map { it.toEntity() }
             dao.insertCharacters(entities)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e("StarWarsRepository", "Error refreshing characters", e)
+            // Error propagation could be improved here with a Result wrapper
         }
     }
 
@@ -43,7 +49,8 @@ class StarWarsRepositoryImpl(
             val res = api.fetchPlanet(planetId)
             dao.insertPlanet(PlanetEntity(planetId, res.name))
             res.name
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e("StarWarsRepository", "Error fetching planet $planetId", e)
             "Desconhecido ($planetId)"
         }
     }
@@ -56,7 +63,8 @@ class StarWarsRepositoryImpl(
             val res = api.fetchSpecies(speciesId)
             dao.insertSpecies(SpeciesEntity(speciesId, res.name))
             res.name
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e("StarWarsRepository", "Error fetching species $speciesId", e)
             "Desconhecido ($speciesId)"
         }
     }
